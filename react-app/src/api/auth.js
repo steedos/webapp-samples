@@ -1,13 +1,23 @@
-import defaultUser from '../utils/default-user';
+import { SteedosClient } from '@steedos/client';
+
+const STEEDOS_API_SERVER="http://127.0.0.1:5000"
+
+const client = new SteedosClient();
+client.setUrl(STEEDOS_API_SERVER)
+window.SteedosClient = client;
 
 export async function signIn(email, password) {
   try {
     // Send request
     console.log(email, password);
 
+    let data = await client.login(email, password);
+    
+    localStorage.setItem('steedos:userId', data.user._id)
+    localStorage.setItem('steedos:token', data.token)
     return {
       isOk: true,
-      data: defaultUser
+      data: data.user
     };
   }
   catch {
@@ -21,17 +31,26 @@ export async function signIn(email, password) {
 export async function getUser() {
   try {
     // Send request
+    const token = localStorage.getItem('steedos:token');
+    debugger
+    if (token)
+    {
+      client.setToken(token);
+      const user = await client.getMe();
+      debugger
+      return {
+        isOk: true,
+        data: user
+      };
+    }
 
-    return {
-      isOk: true,
-      data: defaultUser
-    };
   }
-  catch {
-    return {
-      isOk: false
-    };
+  catch (e){
+    console.log(e)
   }
+  return {
+    isOk: false
+  };
 }
 
 export async function createAccount(email, password) {

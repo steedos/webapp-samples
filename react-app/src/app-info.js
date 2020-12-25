@@ -1,3 +1,3 @@
 export default {
-  title: 'Steedos React App'
+  title: 'React App'
 };
